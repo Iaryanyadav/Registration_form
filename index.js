@@ -1,50 +1,50 @@
-var express = require("express")
-var bodyParser = require("body-parser")
-var mongoose=require("mongoose")
+var express = require("express");
+var bodyParser = require("body-parser");
+var mongoose = require("mongoose");
 
-const app=express()
+const app = express();
 
-app.use(bodyParser.json())
-app.use(express.static('public'))
-app.use(bodyParser.urlencoded({
-    extended:true
-}))
+app.use(bodyParser.json());
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/registration')
-var db=mongoose.connection
-db.on('error',() => console.log("Error in Connecting to Database"))
-db.once('open',() => console.log("Connected to Database"))
+mongoose.connect('mongodb://localhost:27017/registration', { useNewUrlParser: true, useUnifiedTopology: true });
+var db = mongoose.connection;
 
-app.post("/sign_up",(req, res) => {
-    var name= req.body.name
-    var age=req.body.age
-    var email=req.body.email
-    var phno=req.body.phno
-    var gender=req.body.gender
-    var password=req.body.password
+db.on('error', () => console.log("Error in Connecting to Database"));
+db.once('open', () => console.log("Connected to Database"));
 
-    var data={
-        "name":name,
-        "age":age,
-        "email":email,
-        "phno":phno,
-        "gender":gender,
-        "password":password
-    }
-    db.collection('users').insertOne(data,(err, collection) => {
-        if(err){
-            throw err;
+app.post("/sign_up", (req, res) => {
+    const { name, age, email, phno, gender, password } = req.body;
+
+    const data = {
+        name,
+        age,
+        email,
+        phno,
+        gender,
+        password
+    };
+
+    db.collection('users').insertOne(data, (err, collection) => {
+        if (err) {
+            return res.status(500).send("Error inserting record");
         }
-        console.log("Record Inserted Succesfully")
-    })
-    return res.redirect('signup_successful.html')
-})
+        console.log("Record Inserted Successfully");
+        res.redirect('/signup_successful.html');
+    });
+});
 
-app.get("/",(req, res) => {
-    res.set({
-        "Allow-acces-Allow-Origin":'*'
-    })
-    return res.redirect('index.html')
-}).listen(3000);
+app.get("/", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", '*');
+    res.sendFile(__dirname + '/public/index.html');
+});
 
-console.log("Listening on port 3000")
+app.get("/signup", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", '*');
+    res.sendFile(__dirname + '/public/signup.html');
+});
+
+app.listen(3000, () => {
+    console.log("Listening on port 3000");
+});
