@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({
     extended:true
 }))
 
-mongoose.connect('mongodb://localhost:27017/Database')
+mongoose.connect('mongodb://localhost:27017/registration')
 var db=mongoose.connection
 db.on('error',() => console.log("Error in Connecting to Database"))
 db.once('open',() => console.log("Connected to Database"))
